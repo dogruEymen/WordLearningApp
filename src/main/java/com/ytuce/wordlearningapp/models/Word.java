@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "word")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Word {
@@ -18,10 +19,6 @@ public class Word {
     private Long wordId;
 
     private String writing;
-    private String wordType;
-
-    @OneToMany(mappedBy = "word")
-    private List<ExampleSentence> exampleSentences;
 
     @OneToMany(mappedBy = "word")
     private List<WordWithMeaning> meanings;

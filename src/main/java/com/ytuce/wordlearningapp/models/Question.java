@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "question")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Question {
@@ -24,23 +25,17 @@ public class Question {
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
-    @ManyToOne
-    @JoinColumn(name = "meaning_id")
-    private Meaning meaning;
-
     @OneToMany(mappedBy = "question")
     private List<Answer> correctAnswers;
 
     @OneToMany(mappedBy = "question")
     private List<Answer> userAnswers;
 
-    public void addUserAnswer(Answer answer) {
-        answer.setQuestion(this);
-        this.userAnswers.add(answer);
-    }
-
-    public void addCorrectAnswer(Answer answer) {
-        answer.setQuestion(this);
-        this.userAnswers.add(answer);
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "question_word_meanings",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "word_with_meaning_id")
+    )
+    private List<WordWithMeaning> options;
 }

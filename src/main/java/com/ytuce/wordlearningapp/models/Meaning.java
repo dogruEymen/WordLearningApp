@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "meaning")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Meaning {
@@ -20,6 +21,6 @@ public class Meaning {
     @OneToMany(mappedBy = "meaning")
     private List<WordWithMeaning> wordMeanings;
 
-    @OneToMany(mappedBy = "meaning")
-    private List<Question> questions;
+    private String descriptionEn;
+    private String descriptionTr;
 }

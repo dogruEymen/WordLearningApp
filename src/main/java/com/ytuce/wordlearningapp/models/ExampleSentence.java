@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Table(name = "example_sentence")
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExampleSentence {
@@ -17,7 +18,6 @@ public class ExampleSentence {
     private String sentenceTr;
     private String sentenceEn;
 
-    @ManyToOne
-    @JoinColumn(name = "word_with_meaning_id")
-    private WordWithMeaning word;
+    @OneToOne
+    private WordWithMeaning wordWithMeaning;
 }

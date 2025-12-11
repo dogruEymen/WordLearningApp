@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "answer")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Answer {
@@ -25,7 +26,7 @@ public class Answer {
     @JoinTable(
             name = "answer_word_with_meaning",
             joinColumns = @JoinColumn(name = "answer_id"),
-            inverseJoinColumns = @JoinColumn(name = "word_with_meaning_id")
+            inverseJoinColumns = @JoinColumn(name = "word_id")
     )
-    private List<WordWithMeaning> wordWithMeanings;
+    private List<Word> answerWords;
 }

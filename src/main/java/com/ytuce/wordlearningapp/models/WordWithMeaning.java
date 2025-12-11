@@ -8,20 +8,24 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Table(name = "word_with_meaning")
 @NoArgsConstructor
 @AllArgsConstructor
 public class WordWithMeaning {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long wordWithMeaningId;
 
-    private String descriptionEn;
-    private String descriptionTr;
+    private String part_of_speech;
 
     @ManyToOne
     @JoinColumn(name = "word_id")
     private Word word;
+
+    @OneToOne
+    @JoinColumn(name = "example_sentence_id")
+    private ExampleSentence exampleSentence;
 
     @ManyToOne
     @JoinColumn(name = "meaning_id")
