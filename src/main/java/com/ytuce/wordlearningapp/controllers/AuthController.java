@@ -1,9 +1,9 @@
-package com.ytuce.wordlearningapp.controllers.auth;
+package com.ytuce.wordlearningapp.controllers;
 
-import com.ytuce.wordlearningapp.controllers.auth.requests.LoginRequest;
-import com.ytuce.wordlearningapp.controllers.auth.requests.RegisterRequest;
-import com.ytuce.wordlearningapp.controllers.auth.responses.AuthResponse;
-import com.ytuce.wordlearningapp.services.AuthService;
+import com.ytuce.wordlearningapp.services.auth.requests.LoginRequest;
+import com.ytuce.wordlearningapp.services.auth.requests.RegisterRequest;
+import com.ytuce.wordlearningapp.services.auth.responses.AuthResponse;
+import com.ytuce.wordlearningapp.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

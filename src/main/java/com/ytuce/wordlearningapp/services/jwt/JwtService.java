@@ -1,4 +1,4 @@
-package com.ytuce.wordlearningapp.services;
+package com.ytuce.wordlearningapp.services.jwt;
 
 import com.ytuce.wordlearningapp.models.User;
 import io.jsonwebtoken.Jwts;

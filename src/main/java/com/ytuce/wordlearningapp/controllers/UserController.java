@@ -1,7 +1,7 @@
-package com.ytuce.wordlearningapp.controllers.user;
+package com.ytuce.wordlearningapp.controllers;
 
-import com.ytuce.wordlearningapp.controllers.user.responses.UserProfileResponse;
-import com.ytuce.wordlearningapp.services.UserService;
+import com.ytuce.wordlearningapp.services.user.responses.UserProfileResponse;
+import com.ytuce.wordlearningapp.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

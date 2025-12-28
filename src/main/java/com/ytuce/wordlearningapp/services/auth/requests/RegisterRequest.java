@@ -1,4 +1,4 @@
-package com.ytuce.wordlearningapp.controllers.auth.requests;
+package com.ytuce.wordlearningapp.services.auth.requests;
 
 import lombok.Data;
 

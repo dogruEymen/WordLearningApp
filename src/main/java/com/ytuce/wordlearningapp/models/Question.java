@@ -33,7 +33,7 @@ public class Question {
 
     @ManyToMany
     @JoinTable(
-            name = "question_word_meanings",
+            name = "question_options",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "word_with_meaning_id")
     )

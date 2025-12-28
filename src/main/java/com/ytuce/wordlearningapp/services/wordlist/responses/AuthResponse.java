@@ -1,4 +1,4 @@
-package com.ytuce.wordlearningapp.controllers.auth.responses;
+package com.ytuce.wordlearningapp.services.wordlist.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

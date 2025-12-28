@@ -1,6 +1,6 @@
-package com.ytuce.wordlearningapp.services;
+package com.ytuce.wordlearningapp.services.user;
 
-import com.ytuce.wordlearningapp.controllers.user.responses.UserProfileResponse;
+import com.ytuce.wordlearningapp.services.user.responses.UserProfileResponse;
 import com.ytuce.wordlearningapp.models.User;
 import com.ytuce.wordlearningapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

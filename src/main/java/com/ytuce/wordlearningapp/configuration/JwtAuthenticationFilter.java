@@ -2,7 +2,7 @@ package com.ytuce.wordlearningapp.configuration;
 
 import com.ytuce.wordlearningapp.models.User;
 import com.ytuce.wordlearningapp.repositories.UserRepository;
-import com.ytuce.wordlearningapp.services.JwtService;
+import com.ytuce.wordlearningapp.services.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

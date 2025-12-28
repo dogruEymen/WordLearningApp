@@ -1,10 +1,11 @@
-package com.ytuce.wordlearningapp.services;
+package com.ytuce.wordlearningapp.services.auth;
 
-import com.ytuce.wordlearningapp.controllers.auth.requests.LoginRequest;
-import com.ytuce.wordlearningapp.controllers.auth.requests.RegisterRequest;
-import com.ytuce.wordlearningapp.controllers.auth.responses.AuthResponse;
+import com.ytuce.wordlearningapp.services.auth.requests.LoginRequest;
+import com.ytuce.wordlearningapp.services.auth.requests.RegisterRequest;
+import com.ytuce.wordlearningapp.services.auth.responses.AuthResponse;
 import com.ytuce.wordlearningapp.models.User;
 import com.ytuce.wordlearningapp.repositories.UserRepository;
+import com.ytuce.wordlearningapp.services.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

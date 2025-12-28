@@ -24,7 +24,7 @@ public class Answer {
 
     @ManyToMany
     @JoinTable(
-            name = "answer_word_with_meaning",
+            name = "answer_word",
             joinColumns = @JoinColumn(name = "answer_id"),
             inverseJoinColumns = @JoinColumn(name = "word_id")
     )
