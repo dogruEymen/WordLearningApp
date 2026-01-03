@@ -31,7 +31,7 @@ public class Question {
     private List<Answer> correctAnswers;
 
     @OneToMany(mappedBy = "question")
-    private List<Answer> userAnswers;
+    private List<UserAnswer> userAnswers;
 
     @ManyToMany
     @JoinTable(
