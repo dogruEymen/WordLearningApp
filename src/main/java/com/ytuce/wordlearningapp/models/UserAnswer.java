@@ -10,15 +10,15 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "answer")
+@Table(name = "user_answer")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Answer {
+public class UserAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long answerId;
+    private Long userAnswerId;
 
     @ManyToOne
     @JoinColumn(name = "question_id")
@@ -26,8 +26,8 @@ public class Answer {
 
     @ManyToMany
     @JoinTable(
-            name = "answer_word",
-            joinColumns = @JoinColumn(name = "answer_id"),
+            name = "user_answer_word",
+            joinColumns = @JoinColumn(name = "user_answer_id"),
             inverseJoinColumns = @JoinColumn(name = "word_id")
     )
     private List<Word> answerWords;

@@ -1,6 +1,7 @@
 package com.ytuce.wordlearningapp.models;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "example_sentence")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ExampleSentence {
 
     @Id
@@ -18,6 +20,6 @@ public class ExampleSentence {
     private String sentenceTr;
     private String sentenceEn;
 
-    @OneToOne
+    @OneToOne(mappedBy = "exampleSentence")
     private WordWithMeaning wordWithMeaning;
 }

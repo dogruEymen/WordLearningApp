@@ -2,6 +2,7 @@ package com.ytuce.wordlearningapp.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,13 +12,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "word_with_meaning")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class WordWithMeaning {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wordWithMeaningId;
 
-    private String part_of_speech;
+    private String partOfSpeech;
 
     @ManyToOne
     @JoinColumn(name = "word_id")

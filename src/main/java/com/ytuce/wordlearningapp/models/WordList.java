@@ -2,6 +2,7 @@ package com.ytuce.wordlearningapp.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Table(name = "word_list")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class WordList {
 
     @Id
@@ -20,9 +22,11 @@ public class WordList {
 
     private String name;
 
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
 
     @ManyToMany
     @JoinTable(
@@ -31,6 +35,7 @@ public class WordList {
             inverseJoinColumns = @JoinColumn(name = "word_with_meaning_id")
     )
     private List<WordWithMeaning> wordWithMeaningList;
+
 
     @OneToMany(mappedBy = "wordList")
     private List<Quiz> quizzes;
