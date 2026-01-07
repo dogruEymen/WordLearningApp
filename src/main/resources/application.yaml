@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/wordlearn
     username: postgres
-    password: 1456325
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:

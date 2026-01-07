@@ -20,7 +20,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questionId;
 
-    private String questionType;
+    //private String questionType;
     private String questionSentence;
 
     @ManyToOne
