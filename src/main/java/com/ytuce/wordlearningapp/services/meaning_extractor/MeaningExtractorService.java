@@ -203,28 +203,6 @@ public class MeaningExtractorService {
 
         return result;
 
-/*
-        return """
-                {
-                    "word": "Creativity",
-                    "partOfSpeech": "Noun",
-                    "meaningEN": "The use of imagination or original ideas to create something; inventiveness.",
-                    "meaningTR": "Yaratıcılık, üretkenlik.",
-                    "synonyms": [
-                        "inventiveness",
-                        "imagination",
-                        "originality",
-                        "innovation",
-                        "artistry",
-                        "resourcefulness",
-                        "vision"
-                    ],
-                    "exampleSentence": "The marketing team's creativity led to a campaign that tripled the company's sales.",
-                    "exampleSentenceTR": "Pazarlama ekibinin yaratıcılığı, şirketin satışlarını üç katına çıkaran bir kampanyaya yol açtı."
-                }
-                """;
-
-                */
     }
 
     private WordAnalysisResult parseLLMResponse(String llmResponse) {
@@ -234,28 +212,7 @@ public class MeaningExtractorService {
             e.printStackTrace();
             return null;
         }
-/*
-        var result = new WordAnalysisResult();
-        result.setWord("Creativity");
-        result.setMeaningEN("The use of imagination or original ideas to create something; inventiveness.");
-        result.setMeaningTR("Yaratıcılık, üretkenlik.");
-        List<String> synonyms = List.of(
-                "inventiveness",
-                "imagination",
-                "originality",
-                "innovation",
-                "artistry",
-                "resourcefulness",
-                "vision"
-                );
 
-        result.setSynonyms(synonyms);
-        result.setExampleSentence("The marketing team's creativity led to a campaign that tripled the company's sales.");
-        result.setExampleSentenceTR("Pazarlama ekibinin yaratıcılığı, şirketin satışlarını üç katına çıkaran bir kampanyaya yol açtı.");
-        result.setPartOfSpeech("Noun");
-        return result;
-
- */
     }
 
 

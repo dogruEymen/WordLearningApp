@@ -23,6 +23,8 @@ public class Question {
     //private String questionType;
     private String questionSentence;
 
+    private QuestionType questionType;
+
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;

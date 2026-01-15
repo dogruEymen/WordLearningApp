@@ -18,8 +18,10 @@ import java.util.List;
 public class QuizService {
     private final WordListRepository wordListRepository;
     private final UserRepository userRepository;
-    private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
+
+    private final int QUESTION_COUNT = 20;
+
 
     public QuizDto generateQuiz(String email, GenerateQuizRequest req)
     {
@@ -41,6 +43,19 @@ public class QuizService {
     private List<Question> generateQuestions(User user, List<WordWithMeaning> wordWithMeaningList)
     {
 
+        var q = Question.builder()
+                .questionSentence("Test sentence")
+                .questionType(QuestionType.MULTIPLE_CHOICE)
+                .build();
+
+        return new ArrayList<>();
+        /*
+
+        generateOptionsForQuestion();
+
+        return List.of(
+          Question.builder()
+        );
         // I think it could be better to just sort the list based on scores, we do not need the scores directly
 
         sortByScore(user, wordWithMeaningList);
@@ -51,8 +66,6 @@ public class QuizService {
         for(int i = 0; i < wordWithMeaningList.size()/2; i++)
         {
             WordWithMeaning wordWithMeaning = wordWithMeaningList.get(i);
-
-
 
             questions.add(new Question());
         }
@@ -69,7 +82,22 @@ public class QuizService {
         }
 
         return questions;
+        */
+    }
 
+    private void generateOptionsForQuestion(Question q)
+    {
+        switch (q.getQuestionType())
+        {
+
+        }
+
+        if(q.getQuestionType() == QuestionType.FILL_IN_THE_BLANK)
+        {
+            return;
+        }
+
+        throw new RuntimeException("Not implemented");
     }
 
     private Question generateQuestion(List<WordWithMeaning> wordWithMeaningList, WordWithMeaning wordWithMeaning)

@@ -13,6 +13,7 @@ import com.ytuce.wordlearningapp.services.wordlist.responses.WordListDto;
 import com.ytuce.wordlearningapp.services.wordlist.responses.WordWithMeaningDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class WordListService {
     private final UserRepository userRepository;
 
     @Transactional
+    @Async
     public void addWord(long wordListId, AddWordRequest req, String userEmail) {
 
         if(!isAddWordRequestValid(req))
@@ -33,7 +35,6 @@ public class WordListService {
 
         var extractMeaningRequest = new ExtractMeaningRequest(req);
 
-        // This method both extracts and persists the meaning of the word
         WordWithMeaning wordToAdd = meaningExtractorService.extractMeaning(extractMeaningRequest);
 
         WordList wordList = wordListRepository.findById(wordListId).orElseThrow();

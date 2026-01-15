@@ -19,10 +19,9 @@ public class QuizController {
     private final QuizService quizService;
 
 
-    @GetMapping("/generate-quiz")
+    @GetMapping("/generate-quiz/:wordlistId")
     public ResponseEntity<QuizDto> generateQuiz(Authentication auth, GenerateQuizRequest req) {
         String email = auth.getName();
         return ResponseEntity.ok(quizService.generateQuiz(email, req));
     }
 }
-
