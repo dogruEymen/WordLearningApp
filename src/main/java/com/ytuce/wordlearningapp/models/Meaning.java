@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnTransformer;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Meaning {
     private Long meaningId;
 
     @OneToMany(mappedBy = "meaning")
+    @Lazy
     private List<WordWithMeaning> wordMeanings;
 
     @Column(columnDefinition = "vector")

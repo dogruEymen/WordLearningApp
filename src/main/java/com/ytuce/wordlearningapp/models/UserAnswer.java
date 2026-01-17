@@ -24,6 +24,8 @@ public class UserAnswer {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    private boolean isCorrect;
+
     @ManyToMany
     @JoinTable(
             name = "user_answer_word",

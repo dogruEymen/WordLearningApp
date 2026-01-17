@@ -1,4 +1,4 @@
-﻿package com.ytuce.wordlearningapp.models;
+package com.ytuce.wordlearningapp.models;
 
 public enum QuestionType {
     MULTIPLE_CHOICE,

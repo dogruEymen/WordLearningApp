@@ -39,6 +39,11 @@ public class WordListService {
 
         WordList wordList = wordListRepository.findById(wordListId).orElseThrow();
 
+        if(wordList.getWordWithMeaningList().contains(wordToAdd))
+        {
+            return;
+        }
+
         wordList.getWordWithMeaningList().add(wordToAdd);
 
         User user = userRepository.findByEmail(userEmail).orElseThrow();

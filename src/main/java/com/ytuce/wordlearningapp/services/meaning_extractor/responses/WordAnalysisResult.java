@@ -10,7 +10,7 @@ public class WordAnalysisResult {
     private String partOfSpeech;
     private String meaningEN;
     private String meaningTR;
-    private List<String> synonyms;
+    private List<SynonymDto> synonyms;
     private String exampleSentence;
     private String exampleSentenceTR;
 }
