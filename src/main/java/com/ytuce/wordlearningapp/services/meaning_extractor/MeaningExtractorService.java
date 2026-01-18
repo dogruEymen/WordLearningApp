@@ -4,16 +4,23 @@ import com.ytuce.wordlearningapp.models.ExampleSentence;
 import com.ytuce.wordlearningapp.models.Meaning;
 import com.ytuce.wordlearningapp.models.Word;
 import com.ytuce.wordlearningapp.models.WordWithMeaning;
-import com.ytuce.wordlearningapp.repositories.*;
+import com.ytuce.wordlearningapp.repositories.ExampleSentenceRepository;
+import com.ytuce.wordlearningapp.repositories.MeaningRepository;
+import com.ytuce.wordlearningapp.repositories.WordRepository;
+import com.ytuce.wordlearningapp.repositories.WordWithMeaningRepository;
 import com.ytuce.wordlearningapp.services.meaning_extractor.requests.ExtractMeaningRequest;
 import com.ytuce.wordlearningapp.services.meaning_extractor.requests.TextGenerationRequest;
 import com.ytuce.wordlearningapp.services.meaning_extractor.requests.VectorRequest;
 import com.ytuce.wordlearningapp.services.meaning_extractor.responses.SynonymDto;
 import com.ytuce.wordlearningapp.services.meaning_extractor.responses.TextGenerationResponse;
 import com.ytuce.wordlearningapp.services.meaning_extractor.responses.WordAnalysisResult;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +37,9 @@ record CrossEncodeResponse(Double score) {}
 @Service
 @RequiredArgsConstructor
 public class MeaningExtractorService {
+    @Lazy
+    @Autowired
+    private MeaningExtractorService self;
 
     private final WordRepository wordRepository;
     private final MeaningRepository meaningRepository;
@@ -38,14 +48,13 @@ public class MeaningExtractorService {
     private RestTemplate restTemplate = new RestTemplate();
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final int MAX_RECURSION_DEPTH = 2;
+    private static final int MAX_RECURSION_DEPTH = 1;
 
     //@Transactional
     public WordWithMeaning extractMeaning(ExtractMeaningRequest req) {
         return extractMeaningRecursive(req, 0);
     }
 
-    @Async
     private WordWithMeaning extractMeaningRecursive(ExtractMeaningRequest req, int currentDepth) {
         try {
             WordAnalysisResult analysisResult = analyzeWord(req);
@@ -76,7 +85,6 @@ public class MeaningExtractorService {
                 }
             }
 
-
             Optional<Word> foundWord = wordRepository.findOneByWriting(analysisResult.getWord());
 
             word = foundWord.orElse(word);
@@ -86,26 +94,26 @@ public class MeaningExtractorService {
             if(isMeaningFound && isWordFound)
             {
                 var wordWithMeaning = wordWithMeaningRepository.findByWord_WordIdAndMeaning_MeaningId(foundWord.get().getWordId(), meaning.getMeaningId());
-
-                if(wordWithMeaning.isPresent() && wordWithMeaning.get().getPartOfSpeech() == analysisResult.getPartOfSpeech())
+                // TODO: Check here
+                if(wordWithMeaning.isPresent()) //  && Objects.equals(wordWithMeaning.get().getPartOfSpeech(), analysisResult.getPartOfSpeech())
                 {
                     return wordWithMeaning.get();
                 }
             }
 
             if (!isMeaningFound) {
-                meaning = meaningRepository.save(meaning);
+                meaning = meaningRepository.saveAndFlush(meaning);
             }
 
             if (!isWordFound) {
-                word = wordRepository.save(word);
+                word = wordRepository.saveAndFlush(word);
             }
 
             ExampleSentence exampleSentence = ExampleSentence.builder()
                     .sentenceTr(analysisResult.getExampleSentenceTR())
                     .sentenceEn(analysisResult.getExampleSentence())
                     .build();
-            exampleSentence = exampleSentenceRepository.save(exampleSentence);
+            exampleSentence = exampleSentenceRepository.saveAndFlush(exampleSentence);
 
             WordWithMeaning wordWithMeaning = WordWithMeaning.builder()
                     .meaning(meaning)
@@ -114,11 +122,11 @@ public class MeaningExtractorService {
                     .partOfSpeech(analysisResult.getPartOfSpeech())
                     .build();
 
-            wordWithMeaning = wordWithMeaningRepository.save(wordWithMeaning);
+            wordWithMeaning = wordWithMeaningRepository.saveAndFlush(wordWithMeaning);
 
             if (currentDepth < MAX_RECURSION_DEPTH && analysisResult.getSynonyms() != null) {
                 for (var synonymData : analysisResult.getSynonyms()) {
-                    processSynonym(synonymData, currentDepth);
+                    self.processSynonym(synonymData, currentDepth);
                 }
             }
 
@@ -132,7 +140,8 @@ public class MeaningExtractorService {
         return null;
     }
 
-    private void processSynonym(SynonymDto synonymData, int currentDepth) {
+    @Async
+    public void processSynonym(SynonymDto synonymData, int currentDepth) {
         try {
             String synonymWord = synonymData.getWord();
             String sentence = synonymData.getExampleSentence();

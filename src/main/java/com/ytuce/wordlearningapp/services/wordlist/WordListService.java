@@ -1,19 +1,18 @@
 package com.ytuce.wordlearningapp.services.wordlist;
 
 import com.ytuce.wordlearningapp.models.User;
+import com.ytuce.wordlearningapp.models.WordList;
 import com.ytuce.wordlearningapp.models.WordWithMeaning;
 import com.ytuce.wordlearningapp.repositories.UserRepository;
+import com.ytuce.wordlearningapp.repositories.WordListRepository;
 import com.ytuce.wordlearningapp.services.meaning_extractor.MeaningExtractorService;
 import com.ytuce.wordlearningapp.services.meaning_extractor.requests.ExtractMeaningRequest;
 import com.ytuce.wordlearningapp.services.wordlist.requests.AddWordRequest;
-import com.ytuce.wordlearningapp.models.WordList;
-import com.ytuce.wordlearningapp.repositories.WordListRepository;
 import com.ytuce.wordlearningapp.services.wordlist.requests.CreateWordListRequest;
 import com.ytuce.wordlearningapp.services.wordlist.responses.WordListDto;
 import com.ytuce.wordlearningapp.services.wordlist.responses.WordWithMeaningDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class WordListService {
     private final UserRepository userRepository;
 
     @Transactional
-    @Async
     public void addWord(long wordListId, AddWordRequest req, String userEmail) {
 
         if(!isAddWordRequestValid(req))
