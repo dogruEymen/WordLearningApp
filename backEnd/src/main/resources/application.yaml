@@ -1,0 +1,57 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wordlearn
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  jackson:
+    serialization:
+      indent_output: true
+
+cors:
+  allowed-origins:
+    - "http://localhost:19000"     # React Native Expo Emülatörü
+    - "http://localhost:3000"      # web panel?
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  allowed-headers: "*"
+  allow-credentials: true
+
+jwt:
+  secret: "supersecretkey-change-this-in-prod"
+  expiration: 86400000        # 24 saat (ms)
+  issuer: "wordlearn-app"
+
+# External services (development defaults)
+external:
+  python-service:
+    url: ${PYTHON_SERVICE_URL:http://localhost:8000}
+  ollama:
+    url: ${OLLAMA_URL:http://localhost:11434}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG

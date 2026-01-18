@@ -1,0 +1,67 @@
+# Docker ortamı için yapılandırma
+server:
+  address: 0.0.0.0
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:wordlearn}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  jackson:
+    serialization:
+      indent_output: false
+
+cors:
+  allowed-origins:
+    - "http://localhost:19000"
+    - "http://localhost:3000"
+    - "http://localhost:8081"
+    - "http://10.0.2.2:8080"
+    - "*"
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  allowed-headers: "*"
+  allow-credentials: false
+
+jwt:
+  secret: ${JWT_SECRET:your-super-secret-key-change-in-production-min-32-chars}
+  expiration: ${JWT_EXPIRATION:86400000}
+  issuer: ${JWT_ISSUER:wordlearn-app}
+
+# External services
+external:
+  python-service:
+    url: ${PYTHON_SERVICE_URL:http://python-service:8000}
+  ollama:
+    url: ${OLLAMA_URL:http://ollama:11434}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

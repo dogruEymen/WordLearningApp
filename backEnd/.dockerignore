@@ -1,0 +1,30 @@
+# Build outputs
+build/
+bin/
+out/
+target/
+
+# Gradle cache (keep wrapper)
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test outputs
+test-results/
+
+# Temporary files
+*.tmp
+*.temp
