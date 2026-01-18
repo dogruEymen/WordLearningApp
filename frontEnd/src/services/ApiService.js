@@ -238,8 +238,9 @@ export const quizApi = {
    * @returns {Promise<{quizId: number, questions: Array}>}
    */
   generateQuiz: async (wordListId) => {
-    return await apiRequest(`/quiz/generate-quiz?wordListId=${wordListId}`, {
-      method: 'GET',
+    return await apiRequest('/quiz/generate-quiz', {
+      method: 'POST',
+      body: JSON.stringify({ wordListId }),
     });
   },
 };

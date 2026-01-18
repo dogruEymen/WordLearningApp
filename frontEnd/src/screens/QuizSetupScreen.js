@@ -92,9 +92,23 @@ const QuizSetupScreen = ({ navigation }) => {
       clearInterval(messageInterval);
       setIsLoading(false);
 
-      if (quizResponse && quizResponse.questions) {
+      if (quizResponse && quizResponse.questions && quizResponse.questions.length > 0) {
         // Backend'den gelen quiz verilerini kullan
         const formattedQuestions = formatQuestionsForQuiz(quizResponse.questions, count);
+        
+        if (formattedQuestions.length === 0) {
+          Alert.alert(
+            'Uyarı',
+            'Quiz oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
+            [
+              {
+                text: 'Tamam',
+                onPress: () => setStep(2),
+              },
+            ]
+          );
+          return;
+        }
         
         navigation.replace('Quiz', {
           listName: selectedList.name,
@@ -103,34 +117,32 @@ const QuizSetupScreen = ({ navigation }) => {
           quizId: quizResponse.quizId,
         });
       } else {
-        // Backend boş döndüyse mock data kullan
-        const mockQuizData = generateMockQuizData(count);
-        navigation.replace('Quiz', {
-          listName: selectedList.name,
-          questions: mockQuizData,
-          totalQuestions: count,
-        });
+        // Backend boş döndüyse veya yeterli soru yoksa
+        Alert.alert(
+          'Bilgi',
+          'Bu liste için yeterli soru oluşturulamadı. Quiz oluşturmak için listede en az 8 kelime bulunmalı ve her kelime için eşanlamlı kelimeler olmalıdır.',
+          [
+            {
+              text: 'Tamam',
+              onPress: () => setStep(2),
+            },
+          ]
+        );
       }
     } catch (error) {
       clearInterval(messageInterval);
+      setIsLoading(false);
       console.error('Quiz oluşturma hatası:', error);
       
-      // Hata durumunda mock data ile devam et
+      // Hata durumunda kullanıcıya bilgi ver
+      const errorMessage = error.message || 'Quiz oluşturulurken bir hata oluştu.';
       Alert.alert(
-        'Bilgi',
-        'Quiz backend\'den yüklenemedi. Demo modda devam ediliyor.',
+        'Hata',
+        errorMessage + ' Lütfen tekrar deneyin.',
         [
           {
             text: 'Tamam',
-            onPress: () => {
-              const mockQuizData = generateMockQuizData(count);
-              setIsLoading(false);
-              navigation.replace('Quiz', {
-                listName: selectedList.name,
-                questions: mockQuizData,
-                totalQuestions: count,
-              });
-            },
+            onPress: () => setStep(2),
           },
         ]
       );
@@ -144,20 +156,134 @@ const QuizSetupScreen = ({ navigation }) => {
 
     for (let i = 0; i < count; i++) {
       const q = backendQuestions[i];
-      questions.push({
-        id: `q_${q.questionId || i}`,
-        type: 'multi_choice',
-        question: q.word ? `"${q.word}" kelimesinin anlamı nedir?` : 'Bu kelimenin anlamı nedir?',
-        word: q.word,
-        options: q.options || [
-          { id: 'a', text: 'Seçenek A', isCorrect: true },
-          { id: 'b', text: 'Seçenek B', isCorrect: false },
-          { id: 'c', text: 'Seçenek C', isCorrect: false },
-          { id: 'd', text: 'Seçenek D', isCorrect: false },
-        ],
-        correctIds: ['a'],
-        isMultiSelect: false,
-      });
+      if (!q) continue;
+
+      // QuestionType enum'unu frontend formatına çevir
+      // Backend'den gelen enum değeri string olarak gelebilir
+      let questionType = 'multi_choice'; // Default
+      const typeStr = String(q.questionType || '').toUpperCase();
+      if (typeStr === 'MULTIPLE_CHOICE') {
+        questionType = 'multi_choice';
+      } else if (typeStr === 'SYNONYM_MATCHING') {
+        questionType = 'matching';
+      } else if (typeStr === 'FILL_IN_THE_BLANK') {
+        questionType = 'fill_blank';
+      }
+
+      // Soru tipine göre formatla
+      if (questionType === 'multi_choice') {
+        // Multiple choice soru formatı
+        const backendOptions = q.options || [];
+        if (backendOptions.length === 0) {
+          // Options yoksa bu soruyu atla
+          continue;
+        }
+
+        const options = backendOptions.map((opt, idx) => ({
+          id: `opt_${idx}`,
+          text: opt.meaningTr || opt.writing || `Seçenek ${idx + 1}`,
+          isCorrect: q.correctAnswerWritings?.includes(opt.writing) || false,
+        }));
+
+        // CorrectIds listesini oluştur
+        const correctIds = options
+          .filter(opt => opt.isCorrect)
+          .map(opt => opt.id);
+
+        if (correctIds.length === 0) {
+          // Doğru cevap yoksa bu soruyu atla
+          continue;
+        }
+
+        questions.push({
+          id: `q_${q.questionId || i}`,
+          type: 'multi_choice',
+          question: q.questionSentence || 'Soru',
+          options: options,
+          correctIds: correctIds,
+          isMultiSelect: correctIds.length > 1,
+        });
+      } else if (questionType === 'fill_blank') {
+        // Fill in the blank soru formatı
+        const correctAnswer = q.correctAnswerWritings?.[0] || '';
+        const sentence = q.questionSentence || '';
+        
+        if (!correctAnswer || !sentence || !sentence.includes('_____')) {
+          // Eksik veri varsa bu soruyu atla
+          continue;
+        }
+
+        // Scrambled letters oluştur (doğru cevabın harfleri + ekstra harfler)
+        const answerLetters = correctAnswer.toUpperCase().split('').filter(l => l.trim());
+        if (answerLetters.length === 0) {
+          continue;
+        }
+
+        const extraLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+          .filter(l => !answerLetters.includes(l))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, Math.max(2, answerLetters.length));
+        const scrambledLetters = [...answerLetters, ...extraLetters]
+          .sort(() => Math.random() - 0.5);
+
+        // Hint (ilk option'ın meaningTr'si veya meaningEn'si)
+        const hint = q.options?.[0]?.meaningTr || q.options?.[0]?.meaningEn || '';
+
+        questions.push({
+          id: `q_${q.questionId || i}`,
+          type: 'fill_blank',
+          sentence: sentence,
+          answer: correctAnswer.toUpperCase(),
+          scrambledLetters: scrambledLetters,
+          hint: hint,
+        });
+      } else if (questionType === 'matching') {
+        // Synonym matching soru formatı
+        // Backend'de options çiftler halinde eşanlamlı kelimeleri içerir
+        // correctAnswerWritings her çiftin doğru eşleşmesini belirtir
+        const pairs = [];
+        const options = q.options || [];
+        
+        if (options.length < 2) {
+          // En az 2 option olmalı (bir çift için)
+          continue;
+        }
+
+        // Options'ları çiftler halinde işle
+        // Backend'de her iki consecutive option bir çift oluşturur
+        for (let j = 0; j < options.length; j += 2) {
+          if (j + 1 < options.length) {
+            const opt1 = options[j];
+            const opt2 = options[j + 1];
+            
+            // Her iki option'ın writing'lerini kontrol et
+            const opt1Writing = opt1.writing || '';
+            const opt2Writing = opt2.writing || '';
+            
+            if (!opt1Writing || !opt2Writing) {
+              continue;
+            }
+
+            // Backend'de çift halinde gelen options'ları eşleştir
+            pairs.push({
+              id: `pair_${pairs.length}`,
+              left: opt1Writing,
+              right: opt2Writing,
+            });
+          }
+        }
+
+        if (pairs.length === 0) {
+          // Pairs oluşturulamadıysa bu soruyu atla
+          continue;
+        }
+
+        questions.push({
+          id: `q_${q.questionId || i}`,
+          type: 'matching',
+          pairs: pairs,
+        });
+      }
     }
 
     return questions;
