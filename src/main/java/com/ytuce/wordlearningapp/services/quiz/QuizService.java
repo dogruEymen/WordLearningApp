@@ -6,13 +6,11 @@ import com.ytuce.wordlearningapp.services.question.responses.OptionDto;
 import com.ytuce.wordlearningapp.services.question.responses.QuestionDto;
 import com.ytuce.wordlearningapp.services.quiz.requests.GenerateQuizRequest;
 import com.ytuce.wordlearningapp.services.quiz.responses.QuizDto;
-import com.ytuce.wordlearningapp.services.wordlist.responses.WordWithMeaningDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +47,7 @@ public class QuizService {
         List<Question> questions = new ArrayList<>();
         for (int i = 0; i < selectedWords.size(); i++) {
             Question q = createQuestionForWord(selectedWords.get(i), words);
-            q.setQuiz(quiz);
+            //q.setQuiz(quiz);
             questions.add(q);
         }
 
@@ -114,7 +112,7 @@ public class QuizService {
         Collections.shuffle(distractors);
 
         for (int i = correctAnswerCount; i < 4; i++) {
-            var d = distractors.get(i);
+            var d = distractors.get(i - correctAnswerCount);
             options.add(d);
             distractors.remove(d);
         }
@@ -130,7 +128,7 @@ public class QuizService {
 
     private Question generateFillInBlank(WordWithMeaning target) {
         String sentence = target.getExampleSentence().getSentenceEn();
-        String hidden = sentence.replaceAll("(?i)\\b" + target.getWord().getWriting() + "\\b", "_____");
+        String hidden = sentence.replaceAll("(?i)" + target.getWord().getWriting(), "_____");
 
         Answer ans = Answer.builder().answerWords(List.of(target.getWord())).build();
 
@@ -146,26 +144,37 @@ public class QuizService {
         List<Answer> answers = new ArrayList<>();
         List<WordWithMeaning> options = new ArrayList<>();
         List<WordWithMeaning> shuffled = new ArrayList<>(pool);
+
+        List<WordWithMeaning> all = wordWithMeaningRepository.findAll();
+
+        all.removeAll(pool);
+
+        Collections.shuffle(all);
         Collections.shuffle(shuffled);
 
-        for(int i = 0; i < 8; i+=2)
-        {
-            WordWithMeaning w1 = shuffled.get(i);
-            var foundSynonym = w1.getMeaning().getWordMeanings().stream().filter(wm -> !Objects.equals(wm.getWord().getWriting(), w1.getWord().getWriting())).findFirst();
+        int foundPairs = 0;
+        int index = 0;
 
-            if(foundSynonym.isEmpty())
-            {
-                continue;
+        while (foundPairs < 4 && index < shuffled.size()) {
+            WordWithMeaning w1 = shuffled.get(index);
+
+            var synonymOpt = w1.getMeaning().getWordMeanings().stream()
+                    .filter(wm -> !wm.getWord().getWriting().equals(w1.getWord().getWriting()))
+                    .findFirst();
+
+            if (synonymOpt.isPresent()) {
+                WordWithMeaning w2 = synonymOpt.get();
+
+                options.add(w1);
+                options.add(w2);
+                answers.add(Answer.builder()
+                        .answerWords(List.of(w1.getWord(), w2.getWord()))
+                        .build());
+
+                foundPairs++;
             }
 
-            var w2 = foundSynonym.get();
-
-            options.add(w1);
-            options.add(w2);
-
-            answers.add(Answer.builder().answerWords(List.of(w1.getWord(), w2.getWord())).build());
-
-            pool.remove(w1);
+            index++;
         }
 
         return Question.builder()
@@ -190,16 +199,13 @@ public class QuizService {
         Map<Long, Integer> scores = new HashMap<>();
         list.forEach(w -> scores.put(w.getWordWithMeaningId(), 0));
 
-        List<UserAnswer> history = userAnswerRepository.findAll();
+        List<UserAnswer> history = userAnswerRepository.findByQuestion_Quiz_WordList_User_UserId(user.getUserId());
 
         for (UserAnswer ua : history) {
-            if(ua.getQuestion().getQuiz().getWordList().getUser().getUserId().equals(user.getUserId())) {
-                boolean correct = isCorrect(ua);
-                // Simple Score: +1 correct, -2 wrong.
-                ua.getQuestion().getOptions().forEach(opt ->
-                        scores.computeIfPresent(opt.getWordWithMeaningId(), (k, v) -> v + (correct ? 1 : -2))
-                );
-            }
+            boolean correct = isCorrect(ua);
+            ua.getQuestion().getOptions().forEach(opt ->
+                    scores.computeIfPresent(opt.getWordWithMeaningId(), (k, v) -> v + (correct ? 1 : -2)));
+
         }
         list.sort(Comparator.comparingInt(w -> scores.getOrDefault(w.getWordWithMeaningId(), 0)));
     }
